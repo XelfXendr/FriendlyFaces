@@ -2,6 +2,7 @@ using System.IO;
 using System.Reflection;
 using BepInEx;
 using BepInEx.Logging;
+using BepInEx.Configuration;
 using HarmonyLib;
 using LobbyCompatibility.Attributes;
 using LobbyCompatibility.Enums;
@@ -20,45 +21,72 @@ public class FriendlyFaces : BaseUnityPlugin
     internal new static ManualLogSource Logger { get; private set; } = null!;
     internal static Harmony? Harmony { get; set; }
     public static AssetBundle CustomAssets = null!;
-
+    public static ConfigFile MyConfig = null!;
     private void Awake()
     {
+        // Default rarity of custom items
+        int item_rarity = 30;
+
         Logger = base.Logger;
         Instance = this;
 
-        // loading assets
-        string sAssemblyLocation = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
-        CustomAssets = AssetBundle.LoadFromFile(Path.Combine(sAssemblyLocation, "friendlyfaces"));
+        // Configs
+        MyConfig = base.Config;
+        
+        // Loading assets
+        var assembly = Assembly.GetExecutingAssembly();
+        var asset_stream = assembly.GetManifestResourceStream("FriendlyFaces.assets.friendlyfaces");
+        CustomAssets = AssetBundle.LoadFromStream(asset_stream);
         if (CustomAssets == null) {
             Logger.LogError("{MyPluginInfo.PLUGIN_GUID} v{MyPluginInfo.PLUGIN_VERSION} failed loading assets!");
             return;
         }
 
-        Logger.LogInfo("Awailable assets in FriendlyFaces:");
-        foreach (string sAsset in CustomAssets.GetAllAssetNames())
-            Logger.LogInfo($"{sAsset}");
+        // We want to disable saving our config file every time we bind a
+        // setting as it's inefficient and slow
+        // Configs arre accessed in register items
+        MyConfig.SaveOnConfigSet = false;
+
+        string[] names = new string[] { 
+            "Honza", 
+            "Jirka",
+            "Mára", 
+        };
+        string[] paths = new string[] { 
+            "assets/models/Honza.asset", 
+            "assets/models/Jirka.asset",
+            "assets/models/Mára.asset",
+        };
+
 
         // Register our custom items
-        RegisterItems();
+        RegisterItems(item_rarity, names, paths);
 
+        // We need to manually save since we disabled `SaveOnConfigSet` earlier
+        MyConfig.Save(); 
+        // And finally, we re-enable `SaveOnConfigSet` so changes to our config
+        // entries are written to the config file automatically from now on
+        MyConfig.SaveOnConfigSet = true; 
+        
         // More things expected by libs
         Patch();
         Logger.LogInfo($"{MyPluginInfo.PLUGIN_GUID} v{MyPluginInfo.PLUGIN_VERSION} has loaded!\n\nKdybych měl lopatu, tak ti rozmlátím držku!\n");
     }
 
-    internal static void RegisterItems() {
-        int iRarity = 30;
-
-        foreach (string name in new string[] { "Honza", "Jirka" }) {
-            Instance.RegisterHead(name, iRarity);
+    internal static void RegisterItems(int rarity, string[] names, string[] paths) {
+        for(int i = 0; i < names.Length; i++) {
+            Instance.RegisterHead(names[i], paths[i], rarity);
         }
     }
 
-    internal void RegisterHead(string name, int rarity) {
-        Item head  = CustomAssets.LoadAsset<Item>($"assets/models/{name}.asset");
+    internal void RegisterHead(string name, string path, int rarity) {
+        var rarity_config = Config.Bind<int>(
+            "General", $"{name} Rarity", rarity, $"{name}'s item rarity. Default: {rarity}"
+        );
+        Item head = CustomAssets.LoadAsset<Item>(path);
         LethalLib.Modules.Utilities.FixMixerGroups(head.spawnPrefab);
         LethalLib.Modules.NetworkPrefabs.RegisterNetworkPrefab(head.spawnPrefab);
-        LethalLib.Modules.Items.RegisterScrap(head, rarity, LethalLib.Modules.Levels.LevelTypes.All);
+        LethalLib.Modules.Items.RegisterScrap(head, rarity_config.Value, LethalLib.Modules.Levels.LevelTypes.All);
     }
 
     internal static void Patch()
