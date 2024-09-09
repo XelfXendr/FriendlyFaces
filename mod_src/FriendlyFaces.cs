@@ -38,7 +38,7 @@ public class FriendlyFaces : BaseUnityPlugin
         var asset_stream = assembly.GetManifestResourceStream("FriendlyFaces.assets.friendlyfaces");
         CustomAssets = AssetBundle.LoadFromStream(asset_stream);
         if (CustomAssets == null) {
-            Logger.LogError("{MyPluginInfo.PLUGIN_GUID} v{MyPluginInfo.PLUGIN_VERSION} failed loading assets!");
+            Logger.LogError($"{MyPluginInfo.PLUGIN_GUID} v{MyPluginInfo.PLUGIN_VERSION} failed loading assets!");
             return;
         }
 
