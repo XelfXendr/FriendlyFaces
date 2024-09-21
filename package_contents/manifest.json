@@ -1,0 +1,11 @@
+{
+    "name": "FriendlyFaces",
+    "version_number": "1.0.3",
+    "website_url": "https://github.com/XelfXendr/FriendlyFaces",
+    "description": "Adds the heads of myself and my friends as collectable scrap.",
+    "dependencies": [
+        "BepInEx-BepInExPack-5.4.2100",
+        "BMX-LobbyCompatibility-1.2.0",
+        "Evaisa-LethalLib-0.16.1"
+    ]
+}

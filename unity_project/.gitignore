@@ -96,8 +96,11 @@ Unity/
 Unity.meta
 ProjectSettings/
 
-# Built assets bundles
-AssetBundles/
+# Built assets bundles except friendlyfaces
+AssetBundles/*
+!AssetBundles/StandaloneWindows
+AssetBundles/StandaloneWindows/*
+!AssetBundles/StandaloneWindows/friendlyfaces
 
 # config
 .vsconfig

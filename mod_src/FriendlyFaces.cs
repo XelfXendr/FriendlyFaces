@@ -8,7 +8,7 @@ using LobbyCompatibility.Attributes;
 using LobbyCompatibility.Enums;
 
 using UnityEngine;
-
+using UnityEngine.Audio;
 namespace FriendlyFaces;
 
 [BepInPlugin(MyPluginInfo.PLUGIN_GUID, MyPluginInfo.PLUGIN_NAME, MyPluginInfo.PLUGIN_VERSION)]
@@ -33,7 +33,7 @@ public class FriendlyFaces : BaseUnityPlugin
         // Configs
         MyConfig = base.Config;
         
-        // Loading assets
+        // Loading assets. They are included in the assembly file.
         var assembly = Assembly.GetExecutingAssembly();
         var asset_stream = assembly.GetManifestResourceStream("FriendlyFaces.assets.friendlyfaces");
         CustomAssets = AssetBundle.LoadFromStream(asset_stream);
@@ -47,6 +47,7 @@ public class FriendlyFaces : BaseUnityPlugin
         // Configs arre accessed in register items
         MyConfig.SaveOnConfigSet = false;
 
+        // Register our custom items
         string[] names = new string[] { 
             "Honza", 
             "Jirka",
@@ -57,9 +58,6 @@ public class FriendlyFaces : BaseUnityPlugin
             "assets/models/Jirka.asset",
             "assets/models/Mára.asset",
         };
-
-
-        // Register our custom items
         RegisterItems(item_rarity, names, paths);
 
         // We need to manually save since we disabled `SaveOnConfigSet` earlier
@@ -70,7 +68,7 @@ public class FriendlyFaces : BaseUnityPlugin
         
         // More things expected by libs
         Patch();
-        Logger.LogInfo($"{MyPluginInfo.PLUGIN_GUID} v{MyPluginInfo.PLUGIN_VERSION} has loaded!\n\nKdybych měl lopatu, tak ti rozmlátím držku!\n");
+        Logger.LogInfo($"{MyPluginInfo.PLUGIN_GUID} v{MyPluginInfo.PLUGIN_VERSION} has loaded!\n\n\"Kdybych měl lopatu, tak ti rozmlátím držku!\"\n");
     }
 
     internal static void RegisterItems(int rarity, string[] names, string[] paths) {
