@@ -10,7 +10,7 @@ build: copy-assets
 
 [windows]
 assemble: build
-	Get-ChildItem -Path "{{justfile_directory()}}\\mod_src\\bin\\Debug\\netstandard2.1\\Xelf.FriendlyFaces.dll", "{{justfile_directory()}}\\package_contents\\*" | \
+	Get-ChildItem -Path "{{justfile_directory()}}\\mod_src\\bin\\Debug\\netstandard2.1\\Xelf.FriendlyFaces.dll", "{{justfile_directory()}}\\package_contents\\*", "{{justfile_directory()}}\\README.md", "{{justfile_directory()}}\\CHANGELOG.md" | \
 	Compress-Archive \
 		-CompressionLevel "Optimal" \
 		-DestinationPath "{{justfile_directory()}}\\FriendlyFaces.zip" \

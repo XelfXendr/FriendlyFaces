@@ -1,1 +1,0 @@
-A mod that adds the heads of myself and couple of my friends as collectable scrap.
